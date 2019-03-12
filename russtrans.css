@@ -1,0 +1,12 @@
+html {
+    font-size: 20pt;
+    font-family: 'Palatino Linotype';
+}
+
+input {
+    font-size: inherit;
+}
+
+button {
+    font-size: inherit;
+}
