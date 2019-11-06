@@ -3,26 +3,30 @@
 <head>
     <link rel="stylesheet" type="text/css" href="russtrans.css">
     <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="russtrans.js" type="text/javascript"></script>
     <title>Russian Transcription</title>
 </head>
 
 <body>
     <h2>Russian Transcription</h2>
     <p>Enter a Russian word below to see its Cyrillic phonetic transcription.</br>
-    Indicate which vowel is under stress with an apostrophe ( ' ) directly after it.</br>
-    Example: котя'та</p>
-    <p>In the transcription, stress is marked in <font style="color: red">red</font>. Tense э is <u>underlined</u>.</p>
+        Indicate which vowel is under stress with an apostrophe ( ' ) directly after it.</br>
+        Example: котя'та</p>
+    <p>In the transcription, stress is marked in
+        <font style="color: red">red</font>. Tense э is <u>underlined</u>.</p>
 
-    <p>Note - This application is still in production.</p>
-
-    <form onsubmit="processText()">
-        <input type="text" id="textIn">
-        <button type="submit">Submit</button>
-    </form>
+    <p>Note - This application is still in production. Please report any bugs you encounter to <a href="mailto:matthew@cheneycreations.com?Subject=RussTrans%20Bug" target="_top">matthew@cheneycreations.com</a></p>
+    <input type="checkbox" id="smartTyping">Smart typing
+    <div id="editor" contenteditable="true">
+        <form onsubmit="processText()">
+            <input type="text" id="textIn">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
     <div id="textOut">
         <p> </p>
     </div>
+    <script src="russtrans.js" type="text/javascript"></script>
+
 </body>
 
 </html>
