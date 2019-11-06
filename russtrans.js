@@ -19,6 +19,8 @@ var sonorantsAndB = ['л', 'р', 'м', 'н', 'в'];
 var voicingPartners = { ш: 'ж', т: 'д', п: 'б', с: 'з', д: 'т', щ: 'щ', ф: 'в', г: 'к', ч: 'ч', к: 'г', ж: 'ш', з: 'с', х: 'х', ц: 'ц', в: 'ф', б: 'п', й: 'й' };
 var voicedArray = ['д', 'г', 'ж', 'з', 'в', 'б']; //excludes sonorants
 var vowelPartners = { ё: 'о', я: 'а', е: 'э', ю: 'у', и: 'и', о: 'о', э: 'э', а: 'а', ы: 'ы', у: 'у' };
+var keyboardPairs = { 65: 'а', 66: 'б', 86: 'в', 71: 'г', 68: 'д', 69: 'е', 49: 'ё', 50: 'ж', 90: 'з', 73: 'и', 74: 'й', 75: 'к', 76: 'л', 77: 'м', 78: 'н', 79: 'о', 80: 'п', 82: 'р', 83: 'с', 84: 'т', 85: 'у', 70: 'ф', 88: 'х', 67: 'ц', 72: 'ч', 87: 'ш', 51: 'щ', 54: 'ъ', 89: 'ы', 186: 'ь', 53: 'э', 52: 'ю', 81: 'я' };
+var keysToAllow = [8, 46, 37, 38, 39, 40, 32, 222, 13];
 
 function wordToArray(textWorking) {
     console.log("in wordToArray");
@@ -118,7 +120,7 @@ function yerisRule(wordArray) {
     for (var i = 1; i < wordArray.length - 1; i++) {
         if (wordArray[i]['letter'] == 'и' && $.inArray(wordArray[i - 1]['letter'], ['ж', 'ш', 'ц']) > -1) {
             if (wordArray[i]['accent'] == 0) {
-                wordArray[i]['transcription'] = 'Ы';
+                wordArray[i]['transcription'] = '<font color=\"red\">ы</font>';
             }
             else {
                 wordArray[i]['transcription'] = 'ы';
@@ -170,13 +172,17 @@ function voicingAssimilation(wordArray) {
 
 //Adds initial softness, returns wordArray
 function addSoftness(wordArray) {
-
-    for (var i = 0; i < wordArray.length - 1; i++) {
-        if (wordArray[i]['type'] == 'consonant' && (wordArray[i + 1]['type'] == 'vowel' || wordArray[i + 1]['type'] == 'sign') && wordArray[i + 1]['softener'] == true) {
-            if ($.inArray(wordArray[i]['letter'], ['ж', 'ш', 'ц','щ','й','ч']) == -1) {
+    console.log('in addSoftness with', wordArray);
+    for (var i = 0; i < wordArray.length; i++) {
+        console.log('checking letter:',wordArray[i]['letter']);
+        if (wordArray[i]['type'] == 'consonant' && i < wordArray.length -1 && (wordArray[i + 1]['type'] == 'vowel' || wordArray[i + 1]['type'] == 'sign') && wordArray[i + 1]['softener'] == true) {
+            if ($.inArray(wordArray[i]['letter'], ['ж', 'ш', 'ц', 'щ', 'й', 'ч']) == -1) {
                 wordArray[i]['soft'] = true;
                 wordArray[i]['transcription'] += '\'';
             }
+        }
+        if (wordArray[i]['type'] == 'consonant' && $.inArray(wordArray[i]['letter'], ['щ', 'й', 'ч']) > -1) {
+            wordArray[i]['soft'] = true;
         }
     }
     return wordArray;
@@ -233,7 +239,13 @@ function ikanje(wordArray) {
                 //do nothing
             }
             else if (wordArray[i]['accent'] == -1) {
-                wordArray[i]['transcription'] = 'и';
+                if (wordArray[i - 1]['letter'] == 'ж') {
+                    wordArray[i]['transcription'] = 'ы';
+                }
+                else {
+                    wordArray[i]['transcription'] = 'и';
+                }
+
             }
             else {
                 wordArray[i]['transcription'] = 'ь';
@@ -261,16 +273,44 @@ function tenseE(wordArray) {
     return wordArray;
 }
 
+var ctrlPressed = false;
+
+$('#editor').keyup(function(e) {
+    console.log($('#smartTyping')[0]['checked']);
+    if (e.which == 17) {
+        ctrlPressed = false;
+    }
+
+})
+
+$("#editor").keydown(function(e) {
+    //console.log(e.which);
+    if ($('#smartTyping')[0]['checked'] == true) {
+        if (e.which == 17) {
+            ctrlPressed = true;
+        }
+        if ($.inArray(e.which, keysToAllow) == -1 && ctrlPressed == false) {
+            //console.log("preventing default");
+            e.preventDefault();
+            if (keyboardPairs[e.which]) {
+                var temp = $('#textIn').val();
+                $('#textIn').val(temp + keyboardPairs[e.which]);
+                //console.log(e.which);
+            }
+        }
+    }
+});
+
 function processText() {
     event.preventDefault();
     console.log("up and running!");
-    var textWorking = $('#textIn').val().toLowerCase().replace(/ /g,"");
+    var textWorking = $('#textIn').val().toLowerCase().replace(/ /g, "");
     console.log("string input: ", textWorking);
     var initialLength = textWorking.length;
     for (var i = 0; i < initialLength; i++) {
         //console.log("in for loop with:", textWorking.substring(i,i+1));
-        if (textWorking.substring(i,i+1) == "ё") {
-            textWorking = textWorking.substring(0,i + 1) + '\'' + textWorking.substring(i + 1);
+        if (textWorking.substring(i, i + 1) == "ё") {
+            textWorking = textWorking.substring(0, i + 1) + '\'' + textWorking.substring(i + 1);
         }
     }
     console.log("text without yo:", textWorking);
